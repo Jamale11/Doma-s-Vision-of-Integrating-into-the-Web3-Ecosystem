@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doma Identity Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2canvas CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- QRCode CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-6">
+
+  <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-8 w-full max-w-md text-center">
+    <h1 class="text-3xl font-bold mb-4">🚀 Doma Identity Demo</h1>
+    <p class="mb-6 text-sm text-gray-200">
+      Register your Web3 identity and get your unique subdomain.
+    </p>
+
+    <input
+      id="username"
+      type="text"
+      placeholder="Enter your username"
+      class="w-full px-4 py-2 rounded-xl mb-4 text-black"
+    />
+
+    <button
+      onclick="registerSubdomain()"
+      class="w-full bg-indigo-500 hover:bg-indigo-600 transition text-white font-semibold py-2 rounded-xl"
+    >
+      Register
+    </button>
+
+    <!-- Result -->
+    <div id="result" class="hidden mt-6">
+      <!-- ID Card -->
+      <div id="idCard" class="p-6 rounded-2xl text-white relative"
+        style="background: linear-gradient(135deg, #1e1b4b, #4338ca); border: 4px solid gold;">
+        
+        <!-- Avatar + Name -->
+        <div class="flex items-center gap-4 mb-4">
+          <img id="avatar" src="" alt="avatar" class="w-16 h-16 rounded-full border-2 border-yellow-400" />
+          <div class="text-left">
+            <p class="text-sm text-gray-300">Web3 Identity</p>
+            <p id="subdomain" class="text-xl font-bold"></p>
+          </div>
+        </div>
+
+        <!-- QR Code + Status -->
+        <div class="flex justify-between items-center mt-4">
+          <div>
+            <p class="text-xs text-gray-300">Status</p>
+            <p class="font-semibold text-green-400">Active ✅</p>
+          </div>
+          <div id="qrcode"></div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-xs text-center text-gray-400 mt-6 italic">
+          Powered by DOMA Protocol
+        </p>
+      </div>
+
+      <!-- Download button -->
+      <button
+        onclick="downloadCard()"
+        class="mt-4 w-full bg-green-500 hover:bg-green-600 transition text-white font-semibold py-2 rounded-xl"
+      >
+        📥 Download ID Card
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function registerSubdomain() {
+      const usernameInput = document.getElementById("username");
+      const resultDiv = document.getElementById("result");
+      const subdomainText = document.getElementById("subdomain");
+      const qrcodeDiv = document.getElementById("qrcode");
+      const avatarImg = document.getElementById("avatar");
+
+      const username = usernameInput.value.trim();
+      if (username === "") return;
+
+      const subdomain = username.toLowerCase() + ".doma";
+      subdomainText.textContent = subdomain;
+      resultDiv.classList.remove("hidden");
+
+      // Unique avatar from Dicebear API
+      avatarImg.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`;
+
+      // Reset QR code
+      qrcodeDiv.innerHTML = "";
+
+      // Generate QR code
+      new QRCode(qrcodeDiv, {
+        text: "https://" + subdomain,
+        width: 80,
+        height: 80,
+        colorDark: "#ffffff",
+        colorLight: "#4338ca",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    function downloadCard() {
+      const card = document.getElementById("idCard");
+
+      html2canvas(card).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "doma-id-card.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  </script>
+
+</body>
+</html>
